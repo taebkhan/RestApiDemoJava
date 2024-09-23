@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Account Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"], input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        input[type="submit"] {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Update Account Details</h2>
+    <form id="updateAccountForm">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstname" placeholder="Enter first name">
+
+        <label for="lastname">Last Name:</label>
+        <input type="text" id="lastname" placeholder="Enter last name">
+
+        <label for="aadhaarcard">Role:</label>
+        <input type="text" id="aadhaarcard" placeholder="Aadhaar Card">
+
+        <label for="accounttype">Role:</label>
+        <input type="text" id="accounttype" placeholder="Account Type">
+
+        <input type="submit" value="Update Account Detail">
+<!--        <button id="updateButton" type="button">Update Account</button>-->
+    </form>
+    <p id="updateMessage" style="color: green;"></p>
+    <div id="errorMessage" style="color: red;"></div>
+</div>
+
+<script>
+    let accountId; // Variable to store the account ID
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Fetch account details
+        fetch(`/ViewAccountDetail`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Account not found');
+                }
+                return response.json();
+            })
+            .then(accountDetails => {
+                if (accountDetails.length > 0) {
+                    const accountDetail = accountDetails[0]; // Get the first account detail
+                    document.getElementById('firstname').value = accountDetail.firstname;
+                    document.getElementById('lastname').value = accountDetail.lastname;
+                    document.getElementById('aadhaarcard').value = accountDetail.aadhaarcard;
+                    document.getElementById('accounttype').value = accountDetail.accounttype;
+
+                    // Store the account ID for updates
+                    accountId = accountDetail.id;
+                } else {
+                    document.getElementById('errorMessage').innerText = 'No account details available.';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').innerText = error.message;
+            });
+
+        // Update button click event
+        document.getElementById('updateAccountForm').addEventListener('submit', function(event) {
+        //document.getElementById('updateButton').addEventListener('click', function() {
+            event.preventDefault();
+
+            if (accountId) {
+                const updatedAccountDetail = {
+                    firstname: document.getElementById('firstname').value,
+                    lastname: document.getElementById('lastname').value,
+                    aadhaarcard: document.getElementById('aadhaarcard').value,
+                    accounttype: document.getElementById('accounttype').value
+                };
+
+                fetch(`/UpdateAccount/${accountId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedAccountDetail) // Send the updated account details
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update account');
+                    }
+                    return response.json(); // Parse the JSON response
+                })
+                .then(data => {
+                    document.getElementById('updateMessage').innerText = data.message; // Show success message
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('errorMessage').innerText = error.message;
+                });
+            } else {
+                document.getElementById('errorMessage').innerText = 'No account to update.';
+            }
+        });
+    });
+</script>
+</body>
+</html>

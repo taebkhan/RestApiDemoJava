@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Account</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"], input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        input[type="submit"] {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Create New Account</h2>
+    <form id="AccountOpeningForm">
+        <label for="fname">First Name:</label>
+        <input type="text" id="fname"  placeholder="Enter first name">
+
+        <label for="lname">Last Name:</label>
+        <input type="text" id="lname"  placeholder="Enter last name">
+
+        <label for="aadhaarcard">Role:</label>
+        <input type="text" id="aadhaarcard"  placeholder="Aadhaar Card">
+
+        <label for="accounttype">Role:</label>
+        <input type="text" id="accounttype"  placeholder="Account Type">
+
+        <input type="submit" value="Create Account">
+    </form>
+    <p id="responseMessage" style="color: green;"></p>
+</div>
+
+<script>
+    document.getElementById('AccountOpeningForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const id = 1;
+        const fname = document.getElementById('fname').value;
+        const lname = document.getElementById('lname').value;
+        const aadhaarcard = document.getElementById('aadhaarcard').value;
+        const accounttype = document.getElementById('accounttype').value;
+
+        const AccountDetails = {
+            id: id,
+            firstname: fname,
+            lastname: lname,
+            aadhaarcard: aadhaarcard,
+            accounttype: accounttype
+        };
+
+        fetch('/CreateAccount', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(AccountDetails)
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('responseMessage').innerText  = data.message;
+            document.getElementById('AccountOpeningForm').reset();
+        })
+        .catch(error => {
+            document.getElementById('responseMessage').innerText = 'Error: ' + error.message;
+        });
+    });
+</script>
+
+</body>
+</html>
